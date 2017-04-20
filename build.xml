@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<project name="Carl" default="deploy-war">
+
+	<property name="root.dir" value="." />
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="doc.dir" value="doc"/>
+	<property name="local.dir" value="doc"/>
+	<property name="lib.dir" value="${root.dir}/lib"/>
+    <property name="classes.dir" value="bin"/>
+	<property name="web.dir" value="WebContent"/>
+	<property name="war.dir" value="war"/>
+	<property name="webcontent.lib.dir" value="${web.dir}/WEB-INF/lib" />
+	<property name="webapp.name" value="carl"/>
+	
+	<!-- Configure the context path for this application -->
+  	<property name="path"     value="/carl"/>
+	
+	<!-- Configure properties to access the Manager application -->
+  	<property name="url"      value="http://localhost:8080/manager"/>
+  	<property name="username" value="eclipse"/>
+ 	<property name="password" value="eclipse"/>
+
+  	<!-- Configure the custom Ant tasks for the Manager application -->
+  	<!--<taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/>
+  	<taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/>
+  	<taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>-->
+
+	<!-- create the classpath -->
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="*.jar"/>
+	</path>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${war.dir}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete dir="${classes.dir}" />
+		<delete dir="${war.dir}"/>
+		<delete dir="${webcontent.lib.dir}" />
+	</target>
+
+	<target name="compile" depends="init">
+	  <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on">
+	    <classpath>
+	        <path refid="classpath"/>
+	    </classpath>
+	  </javac>
+	</target>
+
+	<target name="javadoc" depends="init">
+	  <javadoc packagenames="*" sourcepath="${src.dir}" destdir="${doc.dir}/api"
+	  	author="true"
+        version="true"
+        use="true"
+	  	>
+	    <classpath>
+	        <path refid="classpath"/>
+	    </classpath>
+	  </javadoc>
+	</target>
+
+	<target name="build" depends="clean,compile,buildtime">
+		<loadfile property="time" srcFile="${web.dir}/build.txt"/>
+		<delete file="${build.dir}/carl.jar"/>
+		<jar jarfile="${build.dir}/carl.jar" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Built-By" value="Noterik B.V."/>
+			   	<attribute name="Main-Class" value="org.springfield.carl.restlet.CarlApplication"/>
+				<attribute name="Build" value="${time}"/>
+			</manifest>
+		</jar>
+	</target>
+
+
+	<target name="deploy-war" depends="clean, build">
+		<copy todir="${web.dir}/WEB-INF/lib/">
+			<fileset dir="${build.dir}">
+				<include name="carl.jar"/>
+			</fileset>
+			<fileset dir="${lib.dir}" includes="**/*.jar">
+				<exclude name="dom4j-1.6.1.jar"/>
+				<exclude name="jaxen-1.1.1.jar"/>
+				<exclude name="log4j-1.2.15.jar"/>
+				<exclude name="org.restlet.jar" />
+				<exclude name="mojo.jar" />
+				<exclude name="servlet.jar"/>
+			</fileset>
+		</copy>
+		<war destfile="${war.dir}/carl.war" webxml="${web.dir}/WEB-INF/web.xml">
+			<fileset dir="${web.dir}"/>
+		</war>
+	</target>	
+
+	<target name="deploy-local" depends="build">
+		<copy file="${build.dir}/carl.jar" todir="${web.dir}/WEB-INF/lib" />	
+	</target>
+	
+	<target name="deploy" description="Install web application">
+    <deploy url="${url}" username="${username}" password="${password}"
+            path="${path}" war="file:${war.dir}/${webapp.name}.war"/>
+  </target>
+
+  <target name="reload" description="Reload web application">
+    <reload  url="${url}" username="${username}" password="${password}"
+            path="${path}"/>
+  </target>
+
+  <target name="undeploy" description="Remove web application">
+    <undeploy url="${url}" username="${username}" password="${password}"
+            path="${path}" failonerror="false"/>
+  </target>
+	
+	<target name="buildtime">
+		<tstamp>
+				<format property="time" pattern="yyyy/MM/dd HH:mm:ss" unit="hour"/>
+			</tstamp>
+			<echo file="${web.dir}/build.txt">${time}</echo>
+		</target>
+
+</project>
