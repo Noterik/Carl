@@ -209,7 +209,7 @@ public class LazyHomer implements MargeObserver {
 					}
 					
 					String newbody = "<fsxml><properties>";
-					newbody+="<info>Transcoding nodes</info></properties>";
+					newbody+="<info>File server with ticket support</info></properties>";
 		        	newbody+="<nodes id=\""+myip+"\"><properties>";
 		        	newbody+="<name>unknown</name>";
 		        	newbody+="<status>off</status>";
@@ -217,6 +217,8 @@ public class LazyHomer implements MargeObserver {
 		        	newbody+="<lastseen>"+new Date().getTime()+"</lastseen>";
 		        	newbody+="<preferedsmithers>"+myip+"</preferedsmithers>";
 		        	newbody+="<defaultloglevel>info</defaultloglevel>";
+		        	newbody+="<basepath>/usr/local/data</basepath>";
+		        	newbody+="<contextpath>/carl</contextpath>";
 		       
 		        	newbody+="</properties></nodes></fsxml>";	
 		        	smithers.put("/domain/internal/service/carl/properties",newbody,"text/xml");
