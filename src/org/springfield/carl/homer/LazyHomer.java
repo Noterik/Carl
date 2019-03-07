@@ -182,6 +182,8 @@ public class LazyHomer implements MargeObserver {
 					mp.setPreferedSmithers(child.selectSingleNode("properties/preferedsmithers").getText());
 					mp.setBasePath(child.selectSingleNode("properties/basepath").getText());
 					mp.setContextPath(child.selectSingleNode("properties/contextpath").getText());
+					String apiKey = child.selectSingleNode("properties/apikey") == null ? "" : child.selectSingleNode("properties/apikey").getText();
+					mp.setApiKey(apiKey);
 					
 					if (ipnumber.equals(myip)) {
 						foundmynode = true;
