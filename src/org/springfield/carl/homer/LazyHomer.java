@@ -63,6 +63,7 @@ public class LazyHomer implements MargeObserver {
 	private static Map<String, SmithersProperties> smithers = new HashMap<String, SmithersProperties>();
 	private static Map<String, CarlProperties> carls = new HashMap<String, CarlProperties>();
 	private static LazyHomer ins;
+	private static String apiKey;
 
 	private int retryCounter;
 	
@@ -182,7 +183,6 @@ public class LazyHomer implements MargeObserver {
 					mp.setPreferedSmithers(child.selectSingleNode("properties/preferedsmithers").getText());
 					mp.setBasePath(child.selectSingleNode("properties/basepath").getText());
 					mp.setContextPath(child.selectSingleNode("properties/contextpath").getText());
-					String apiKey = child.selectSingleNode("properties/apikey") == null ? "" : child.selectSingleNode("properties/apikey").getText();
 					mp.setApiKey(apiKey);
 					
 					if (ipnumber.equals(myip)) {
@@ -275,6 +275,8 @@ public class LazyHomer implements MargeObserver {
 		role = props.getProperty("role");
 		if (role==null) role = "production";
 		System.out.println("SERVER ROLE="+role);
+		
+		apiKey = props.getProperty("apiKey", "");
 	}
 	
 	public static String getRole() {
